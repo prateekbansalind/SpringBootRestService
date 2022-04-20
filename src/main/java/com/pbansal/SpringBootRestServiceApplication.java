@@ -40,6 +40,8 @@ public class SpringBootRestServiceApplication implements CommandLineRunner {
 			System.out.println(entity.getAuthor());
 		}
 
+		repository.delete(lib2);
+
 	}
 
 
