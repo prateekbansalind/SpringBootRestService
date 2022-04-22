@@ -1,6 +1,7 @@
 package com.pbansal.controller;
 
 import com.pbansal.repository.ILibraryRepository;
+import com.pbansal.service.LibraryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -14,20 +15,35 @@ public class LibraryController {
     @Autowired
     ILibraryRepository repository;
 
+    @Autowired
+    LibraryService libraryService;
+
 
     @PostMapping("/addBook")
     public ResponseEntity addBookImplementation(@RequestBody Library library){
-        library.setId(library.getIsbn()+library.getAisle());
-        String id = library.getId();
-        repository.save(library);
 
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.add("Unique", id);
+        String id = libraryService.buildId(library.getIsbn(), library.getAisle());
 
         AddResponse addResponse = new AddResponse();
-        addResponse.setMessage("Success book is added.");
-        addResponse.setId(id);
 
-        return new ResponseEntity<AddResponse>(addResponse,httpHeaders,HttpStatus.CREATED);
+        if (!libraryService.checkBookAlreadyExist(id)) {
+            library.setId(id);
+            repository.save(library);
+
+            HttpHeaders httpHeaders = new HttpHeaders();
+            httpHeaders.add("Unique", id);
+
+
+            addResponse.setMessage("Success book is added.");
+            addResponse.setId(id);
+
+            return new ResponseEntity<AddResponse>(addResponse,httpHeaders,HttpStatus.CREATED);
+        }
+        else{
+            addResponse.setMessage("Book is already exist.");
+            addResponse.setId(id);
+            return new ResponseEntity<AddResponse>(addResponse,HttpStatus.ACCEPTED);
+        }
+
     }
 }
