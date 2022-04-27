@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
+
 @RestController
 public class LibraryController {
     @Autowired
@@ -46,4 +48,8 @@ public class LibraryController {
         }
     }
 
+    @GetMapping("getBooks/author")
+    public List<Library> getBookByAuthorNameImpl(@RequestParam(value = "authorName") String authorName){
+        return repository.findAllByAuthor(authorName);
+    }
 }
