@@ -48,8 +48,18 @@ public class LibraryController {
         }
     }
 
-    @GetMapping("getBooks/author")
+    @GetMapping("/getBooks/author")
     public List<Library> getBookByAuthorNameImpl(@RequestParam(value = "authorName") String authorName){
         return repository.findAllByAuthor(authorName);
+    }
+
+    @PutMapping("/updateBook/{id}")
+    public ResponseEntity<Library> updateBookByIdImpl(@PathVariable(value = "id") String id, @RequestBody Library library){
+        Library existingRecord = repository.findById(id).get();
+        existingRecord.setAisle(library.getAisle());
+        existingRecord.setAuthor(library.getAuthor());
+        existingRecord.setBook_name(library.getBook_name());
+        repository.save(existingRecord);
+        return new ResponseEntity<Library>(existingRecord, HttpStatus.OK);
     }
 }
