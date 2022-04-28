@@ -62,4 +62,15 @@ public class LibraryController {
         repository.save(existingRecord);
         return new ResponseEntity<Library>(existingRecord, HttpStatus.OK);
     }
+
+    @DeleteMapping("/deleteBook/{id}")
+    public ResponseEntity<String> deleteBookByIdImpl(@PathVariable(value = "id") String id) {
+        Library record = repository.getById(id);
+        if (libraryService.checkBookAlreadyExist(id)) {
+            repository.delete(record);
+            return new ResponseEntity<String>("Book is deleted", HttpStatus.CREATED);
+        } else {
+            return new ResponseEntity<String>("Book is not present", HttpStatus.NOT_FOUND);
+        }
+    }
 }
