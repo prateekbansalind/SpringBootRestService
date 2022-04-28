@@ -73,4 +73,10 @@ public class LibraryController {
             return new ResponseEntity<String>("Book is not present", HttpStatus.NOT_FOUND);
         }
     }
+
+    @GetMapping("/getBooks")
+    public List<Library> getAllBooksImpl(){
+        List<Library> allRecords = repository.findAll();
+        return allRecords;
+    }
 }
