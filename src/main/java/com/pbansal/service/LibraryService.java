@@ -14,6 +14,9 @@ public class LibraryService {
     ILibraryRepository repository;
 
     public String buildId(String isbn, int aisle){
+        if (isbn.startsWith("Z")){
+            return "OLD" + isbn + aisle;
+        }
         return isbn + aisle;
     }
 
