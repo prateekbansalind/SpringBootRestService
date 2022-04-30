@@ -19,6 +19,8 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -50,9 +52,19 @@ class SpringBootRestServiceApplicationTests {
 		assertEquals(anotherId, "MAN123");
 	}
 
+	public Library buildLibrary(){
+		Library library = new Library();
+		library.setBook_name("Learn C++");
+		library.setAuthor("Mr. X");
+		library.setIsbn("ASD");
+		library.setAisle(321);
+		library.setId("ASD321");
+		return library;
+	}
+
 	@Test
 	public void addBookTest(){
-		Library library = new Library();
+		Library library = buildLibrary();
 		// mock to get id.
 		when(libraryService.buildId(library.getIsbn(), library.getAisle())).thenReturn(library.getId());
 		// mock to declare that record belongs to the provided id is not present in the database.
@@ -72,23 +84,18 @@ class SpringBootRestServiceApplicationTests {
 	@Test
 	// This is serverless mockMvc Test
 	public void addBookControllerTest() throws Exception {
-		Library library = new Library();
+		Library library = buildLibrary();
 		ObjectMapper mapper = new ObjectMapper();
 		String jsonString = mapper.writeValueAsString(library);
 		when(libraryService.buildId(library.getIsbn(), library.getAisle())).thenReturn(library.getId());
 		when(libraryService.checkBookAlreadyExist(library.getId())).thenReturn(false);
 		when(repository.save(any())).thenReturn(library);
-		this.mockMvc.perform(post("/addBook").contentType(MediaType.APPLICATION_JSON).content(jsonString))
-				.andExpect(status().isCreated()); // mock rest service call.
+		this.mockMvc
+				.perform(post("/addBook").contentType(MediaType.APPLICATION_JSON).content(jsonString))
+				.andDo(print())
+				.andExpect(status().isCreated())
+				.andExpect(jsonPath("$.id").value(library.getId()));
 	}
 
-	public Library buildLibrary(){
-		Library library = new Library();
-		library.setBook_name("Learn C++");
-		library.setAuthor("Mr. X");
-		library.setIsbn("ASD");
-		library.setAisle(321);
-		library.setId("ASD321");
-		return library;
-	}
+
 }
