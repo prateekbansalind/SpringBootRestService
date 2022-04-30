@@ -22,9 +22,9 @@ public class LibraryController {
     private static final Logger logger = LoggerFactory.getLogger(LibraryController.class);
     @PostMapping("/addBook")
     public ResponseEntity addBookImplementation(@RequestBody Library library){
-        String id = libraryService.buildId(library.getIsbn(), library.getAisle());
+        String id = libraryService.buildId(library.getIsbn(), library.getAisle()); // dependency to mock
         AddResponse addResponse = new AddResponse();
-        if (!libraryService.checkBookAlreadyExist(id)) {
+        if (!libraryService.checkBookAlreadyExist(id)) {   // dependency to mock
             logger.info("Book doesn't exist in the database, so creating one.");
             library.setId(id);
             repository.save(library);

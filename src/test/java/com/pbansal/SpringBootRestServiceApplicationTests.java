@@ -1,27 +1,62 @@
 package com.pbansal;
-
+import com.pbansal.controller.Library;
+import com.pbansal.controller.LibraryController;
+import com.pbansal.repository.ILibraryRepository;
 import com.pbansal.service.LibraryService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 class SpringBootRestServiceApplicationTests {
 
 	// Dependencies
 	@Autowired
-	LibraryService service;
+	LibraryController libraryController;
+
+	@MockBean
+	ILibraryRepository repository;
+
+	@MockBean
+	LibraryService libraryService;
+
 	@Test
 	void contextLoads() {
 	}
 	@Test
-	public void checkBuildIdLogic(){
+	public void checkBuildIdTest(){
+		LibraryService service = new LibraryService();
 		String id = service.buildId("ZAC", 786);
 		assertEquals(id, "OLDZAC786");
 		String anotherId = service.buildId("MAN", 123);
 		assertEquals(anotherId, "MAN123");
 	}
 
+	@Test
+	public void addBookTest(){
+		Library library = new Library();
+		// mock to get id.
+		when(libraryService.buildId(library.getIsbn(), library.getAisle())).thenReturn(library.getId());
+		// mock to declare that record belongs to the provided id is not present in the database.
+		when(libraryService.checkBookAlreadyExist(library.getId())).thenReturn(false);
+		ResponseEntity addResponse = libraryController.addBookImplementation(buildLibrary());
+		System.out.println(addResponse.getStatusCode());
+		assertEquals(addResponse.getStatusCode(), HttpStatus.CREATED);
+	}
+
+	public Library buildLibrary(){
+		Library library = new Library();
+		library.setBook_name("Learn C++");
+		library.setAuthor("Mr. X");
+		library.setIsbn("ASD");
+		library.setAisle(321);
+		library.setId("ASD321");
+		return library;
+	}
 }
