@@ -1,4 +1,5 @@
 package com.pbansal;
+import com.pbansal.controller.AddResponse;
 import com.pbansal.controller.Library;
 import com.pbansal.controller.LibraryController;
 import com.pbansal.repository.ILibraryRepository;
@@ -45,9 +46,21 @@ class SpringBootRestServiceApplicationTests {
 		when(libraryService.buildId(library.getIsbn(), library.getAisle())).thenReturn(library.getId());
 		// mock to declare that record belongs to the provided id is not present in the database.
 		when(libraryService.checkBookAlreadyExist(library.getId())).thenReturn(false);
-		ResponseEntity addResponse = libraryController.addBookImplementation(buildLibrary());
-		System.out.println(addResponse.getStatusCode());
-		assertEquals(addResponse.getStatusCode(), HttpStatus.CREATED);
+		// Assert HTTP response
+		ResponseEntity response = libraryController.addBookImplementation(buildLibrary());
+		System.out.println(response.getStatusCode());
+		assertEquals(response.getStatusCode(), HttpStatus.CREATED);
+		// Assert response
+		AddResponse addResponse = (AddResponse) response.getBody();
+		assertEquals(addResponse.getId(), library.getId());
+		assertEquals("Success book is added.", addResponse.getMessage());
+	}
+
+	public AddResponse buildResponseBody(){
+		AddResponse addResponse = new AddResponse();
+		addResponse.setMessage("Success book is added.");
+		addResponse.setId("ASD321");
+		return addResponse;
 	}
 
 	public Library buildLibrary(){
