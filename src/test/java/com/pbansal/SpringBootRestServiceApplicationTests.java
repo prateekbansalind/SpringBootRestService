@@ -21,12 +21,11 @@ import java.util.List;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.validateMockitoUsage;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -67,6 +66,18 @@ class SpringBootRestServiceApplicationTests {
 		return library;
 	}
 
+	public Library updateLibrary(){
+		Library library = new Library();
+		library.setBook_name("Learn Java");
+		library.setAuthor("Mosh Corey");
+		library.setIsbn("ASD");
+		library.setAisle(123);
+		library.setId("ASD123");
+		return library;
+	}
+
+
+
 	@Test
 	public void addBookTest(){
 		Library library = buildLibrary();
@@ -89,7 +100,7 @@ class SpringBootRestServiceApplicationTests {
 	@Test
 	// This is serverless mockMvc Test
 	public void addBookControllerTest() throws Exception {
-		Library library = buildLibrary();
+		Library library = buildLibrary();;
 		ObjectMapper mapper = new ObjectMapper();
 		String jsonString = mapper.writeValueAsString(library);
 		when(libraryService.buildId(library.getIsbn(), library.getAisle())).thenReturn(library.getId());
@@ -116,6 +127,24 @@ class SpringBootRestServiceApplicationTests {
 				.andExpect(jsonPath("$.length()", is(2)))
 				.andExpect(jsonPath("$.[0].id").value("ASD321"));
 	}
+
+	// unit test to authenticate update book controller.
+	@Test
+	public void authenticateUpdateBookControllerTest() throws Exception {
+		Library record = buildLibrary();
+		ObjectMapper mapper = new ObjectMapper();
+		String jsonString = mapper.writeValueAsString(updateLibrary());
+		when(libraryService.getBookById(any())).thenReturn(record);
+		String responseBody = "{\"book_name\":\"Learn Java\",\"isbn\":\"ASD\",\"aisle\":123,\"id\":\"ASD321\",\"author\":\"Mosh Corey\"}";
+		this.mockMvc
+				.perform(put("/updateBook/"+record.getId())
+						.contentType((MediaType.APPLICATION_JSON))
+						.content(jsonString))
+				.andDo(print())
+				.andExpect(status().isOk())
+				.andExpect(content().json(responseBody));
+	}
+
 
 
 }

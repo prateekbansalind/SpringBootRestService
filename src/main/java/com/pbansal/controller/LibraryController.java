@@ -64,11 +64,11 @@ public class LibraryController {
     @PutMapping("/updateBook/{id}")
     public ResponseEntity<Library> updateBookByIdImpl(@PathVariable(value = "id") String id, @RequestBody Library library){
         logger.info("Update new information to the queried ID.");
-        Library existingRecord = repository.findById(id).get();
+        Library existingRecord = libraryService.getBookById(id); // dependency
         existingRecord.setAisle(library.getAisle());
         existingRecord.setAuthor(library.getAuthor());
         existingRecord.setBook_name(library.getBook_name());
-        repository.save(existingRecord);
+        repository.save(existingRecord); // dependency
         return new ResponseEntity<Library>(existingRecord, HttpStatus.OK);
     }
 
