@@ -21,7 +21,7 @@ import java.util.List;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.validateMockitoUsage;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -34,13 +34,10 @@ class SpringBootRestServiceApplicationTests {
 	// Dependencies
 	@Autowired
 	LibraryController libraryController;
-
 	@Autowired
 	private MockMvc mockMvc;
-
 	@MockBean
 	ILibraryRepository repository;
-
 	@MockBean
 	LibraryService libraryService;
 
@@ -55,7 +52,6 @@ class SpringBootRestServiceApplicationTests {
 		String anotherId = service.buildId("MAN", 123);
 		assertEquals(anotherId, "MAN123");
 	}
-
 	public Library buildLibrary(){
 		Library library = new Library();
 		library.setBook_name("Learn C++");
@@ -65,7 +61,6 @@ class SpringBootRestServiceApplicationTests {
 		library.setId("ASD321");
 		return library;
 	}
-
 	public Library updateLibrary(){
 		Library library = new Library();
 		library.setBook_name("Learn Java");
@@ -75,9 +70,6 @@ class SpringBootRestServiceApplicationTests {
 		library.setId("ASD123");
 		return library;
 	}
-
-
-
 	@Test
 	public void addBookTest(){
 		Library library = buildLibrary();
@@ -96,7 +88,6 @@ class SpringBootRestServiceApplicationTests {
 		assertEquals(addResponse.getId(), library.getId());
 		assertEquals("Success book is added.", addResponse.getMessage());
 	}
-
 	@Test
 	// This is serverless mockMvc Test
 	public void addBookControllerTest() throws Exception {
@@ -145,6 +136,17 @@ class SpringBootRestServiceApplicationTests {
 				.andExpect(content().json(responseBody));
 	}
 
-
-
+	 // unit test to authenticate delete book controller.
+	@Test
+	public void deleteBookControllerTest() throws Exception {
+		Library record = buildLibrary();
+		when(libraryService.getBookById(any())).thenReturn(record);
+		when(libraryService.checkBookAlreadyExist(any())).thenReturn(true);
+		doNothing().when(repository).delete(record);
+		this.mockMvc
+				.perform(delete("/deleteBook/"+record.getId()))
+				.andDo(print())
+				.andExpect(status().isCreated())
+				.andExpect(content().string("Book is deleted"));
+	}
 }
