@@ -15,10 +15,15 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -95,6 +100,21 @@ class SpringBootRestServiceApplicationTests {
 				.andDo(print())
 				.andExpect(status().isCreated())
 				.andExpect(jsonPath("$.id").value(library.getId()));
+	}
+
+	// unit test for get http method to call records based on author name.
+	@Test
+	public void getBookBasedOnAuthorNameControllerTest() throws Exception {
+		List<Library> li = new ArrayList<Library>();
+		li.add(buildLibrary());
+		li.add(buildLibrary());
+		when(repository.findAllByAuthor(any())).thenReturn(li);
+		this.mockMvc
+				.perform(get("/getBooks/author").param("authorName", "Mr. X"))
+				.andDo(print())
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.length()", is(2)))
+				.andExpect(jsonPath("$.[0].id").value("ASD321"));
 	}
 
 
