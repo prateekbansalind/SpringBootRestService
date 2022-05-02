@@ -13,14 +13,25 @@
 	</parent>
 
 	<groupId>com.pbansal</groupId>
-
 	<artifactId>springbootrestservice</artifactId>
-
 	<version>0.0.1-SNAPSHOT</version>
-
 	<name>SpringBootRestService</name>
-
 	<description>Demo project to  understand Spring Boot</description>
+
+	<profiles>
+
+		<profile>
+			<id>dev</id>
+			<properties>
+				<activatedProperties>dev</activatedProperties>
+			</properties>
+		</profile>
+		<profile>
+
+		</profile>
+
+	</profiles>
+
 
 	<properties>
 		<java.version>11</java.version>
@@ -68,6 +79,13 @@
 <!--			<version>2.6.7</version>-->
 <!--		</dependency>-->
 
+		<dependency>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-failsafe-plugin</artifactId>
+			<version>3.0.0-M6</version>
+			<type>maven-plugin</type>
+		</dependency>
+
 	</dependencies>
 
 	<build>
@@ -78,5 +96,7 @@
 			</plugin>
 		</plugins>
 	</build>
+
+
 
 </project>

@@ -16,9 +16,9 @@ public class testsIT {
         Library library = new Library();
         library.setBook_name("Learn C++");
         library.setAuthor("Mr. X");
-        library.setIsbn("XSD");
+        library.setIsbn("AAA");
         library.setAisle(5521);
-        library.setId("XSD5521");
+        library.setId("AAA5521");
         return library;
     }
 
